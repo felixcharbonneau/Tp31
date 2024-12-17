@@ -105,7 +105,7 @@ public class Util {
      */
     private static void setCodes(String[] codes, HuffmanNode node , String code) {
         if (node.right == null && node.left == null) {
-            codes[node.data] = code;
+            codes[node.data > 0 ? node.data : node.data+256] = code;
         }
         if (node.right != null) {
             setCodes(codes,node.right,code+"1");
