@@ -27,7 +27,9 @@ public class Util {
                 }
             }
             //Écriture de la clé
-            File key = new File("src/main/java/TP3/test.hk");
+
+            String keyName = getFileNameWithoutExtension(file) + ".hk";
+            File key = new File(file.getParentFile(), keyName);
             FileWriter writer = new FileWriter(key);
             writer.write("HK");
             long max = occurences[0];
@@ -36,7 +38,6 @@ public class Util {
                         max = occurences[i];
                     }
             }
-            System.out.println(Arrays.toString(occurences));
             if (max<Byte.MAX_VALUE){
                 writer.write(1);
             } else if (max < Short.MAX_VALUE) {
@@ -68,7 +69,8 @@ public class Util {
             //Écriture du fichier encodé
             String[] codes = new String[256];
             setCodes(codes, queue.front());
-            File encryptedFile = new File("src/main/java/TP3/test.hd");
+            String encryptedFileData = getFileNameWithoutExtension(file) + ".hd";
+            File encryptedFile = new File(file.getParentFile(), encryptedFileData);
             writer.close();
             FileWriter writer1 = new FileWriter(encryptedFile);
             fileInputStream = new FileInputStream(file);
@@ -78,7 +80,7 @@ public class Util {
                 if (byteread > 0) {
                     result.append(codes[byteread]);
                 }else {
-                    result.append((short)byteread + 256);
+                    result.append(codes[(short)byteread + 256]);
                 }
             }
             byte[] bytes = stringToByteArray(String.valueOf(result));
@@ -86,7 +88,6 @@ public class Util {
             writer1.write("HD");
 
             for (byte b : bytes){
-                System.out.println(b);
                 writer1.write(b);
             }
 
@@ -122,7 +123,7 @@ public class Util {
     private static void setCodes(String[] codes, HuffmanNode node){
         String code = "";
         if (node.right == null && node.left == null) {
-            codes[node.data] = code;
+            codes[node.data > 0 ? node.data : node.data+256] = code;
         }
         if (node.right != null) {
             setCodes(codes,node.right,code+"1");
@@ -150,8 +151,12 @@ public class Util {
         return bytes;
     }
 
+    /**
+     * Decodage d'un fichier
+     * @param file fichier de donnees
+     * @throws IOException
+     */
     public static void decryptFile(File file) throws IOException {
-        String dataPath = file.getAbsolutePath();
         String keyName = getFileNameWithoutExtension(file) + ".hk";
         File key = new File(file.getParent(),keyName);
         FileInputStream fileInputStream = new FileInputStream(key);
@@ -159,9 +164,8 @@ public class Util {
         String magicNumber = "";
         magicNumber+=(char)bufferedInputStream.read();
         magicNumber+=(char)bufferedInputStream.read();
-        System.out.println(magicNumber);
         if (!magicNumber.equals("HK")) {
-            System.out.println("fichier invalide");
+            System.out.println("Format de fichier invalide");
         }else {
             int[] ocurrences = new int[256];
             for(short i = 0; i<256; i++){

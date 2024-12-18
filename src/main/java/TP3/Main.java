@@ -19,7 +19,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
             File file = new File("src/main/java/TP3/test.txt");
             Util.encryptFile(file);
-            Util.decryptFile(new File("C:\\Users\\6223134\\IdeaProjects\\TP2\\src\\main\\java\\TP3\\test.hd"));
+            File file2 = new File("src/main/java/TP3/test.hd");
+            Util.decryptFile(file2);
 
             // Création de la barre de menu
             MenuBar menuBar = new MenuBar();
