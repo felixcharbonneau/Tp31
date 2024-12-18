@@ -1,5 +1,8 @@
 package TP3;
 
+/**
+ * Noeud de Huffman
+ */
 public class HuffmanNode {
     public Byte data;
     public HuffmanNode left;
@@ -8,8 +11,8 @@ public class HuffmanNode {
     /**
      * Constructeur
      * @param data donnée
-     * @param left Noeud à gauche
-     * @param right Noeud à droite
+     * @param left Nœud à gauche
+     * @param right Nœud à droite
      */
     public HuffmanNode(Byte data, HuffmanNode left, HuffmanNode right){
         this.data = data;

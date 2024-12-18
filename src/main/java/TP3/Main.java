@@ -1,7 +1,6 @@
 //Main.java
-//Félix Rondeau Félix Charboneau
+//Félix Rondeau Félix Charbonneau
 package TP3;
-
 
 import javafx.application.Application;
 import javafx.scene.control.*;
@@ -15,7 +14,6 @@ import javafx.scene.text.Text;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-
 import java.io.*;
 
 
@@ -27,49 +25,41 @@ public class Main extends Application {
         // Création de la barre de menu
         MenuBar menuBar = new MenuBar();
 
-
         // Menu Fichier
         Menu fileMenu = new Menu("Fichier");
-
 
         MenuItem encodeMenuItem = new MenuItem("Encoder");
         MenuItem decodeMenuItem = new MenuItem("Décoder");
         SeparatorMenuItem separator = new SeparatorMenuItem();
         MenuItem exitMenuItem = new MenuItem("Quitter");
 
-
         // Ajouter les sous-menus au menu Fichier
         fileMenu.getItems().addAll(encodeMenuItem, decodeMenuItem, separator, exitMenuItem);
-
 
         // Action pour quitter
         exitMenuItem.setOnAction(e -> primaryStage.close());
 
-
         // Menu Aide
         Menu helpMenu = new Menu("Aide");
-
 
         MenuItem aboutMenuItem = new MenuItem("À propos");
         MenuItem squirrelMenuItem = new MenuItem("Squirrel Wingsuit");
 
-
         // Ajouter les sous-menus au menu Aide
         helpMenu.getItems().addAll(aboutMenuItem, squirrelMenuItem);
-
 
         // Ajouter les menus à la barre de menu
         menuBar.getMenus().addAll(fileMenu, helpMenu);
 
-
-// Barre de progression avec le texte
+        // Barre de progression avec le texte
         ProgressBar pb = new ProgressBar();
         pb.setProgress(0.0);
+        pb.setMinHeight(60);
+        pb.setMinWidth(500);
         pb.setPrefSize(250,20);
         pb.setVisible(false);
         Text text = new Text("");
         VBox vBox = new VBox(text);
-
 
         // Créer une disposition principale
         BorderPane root = new BorderPane();
@@ -77,21 +67,14 @@ public class Main extends Application {
         root.setCenter(pb);
         root.setBottom(vBox);
 
-
-        // Créer la scènene et configurer la fenêtre principale
+        // Créer la scène et configurer la fenêtre principale
         Scene scene = new Scene(root, 600, 500);
-
-
-        //Action:
-
 
         // Ajouter un événement pour "à propos"
         aboutMenuItem.setOnAction(e -> showAboutInfo(primaryStage));
 
-
-        // Ajouter un événement pour Squirriel
+        // Ajouter un événement pour l'écureuil
         squirrelMenuItem.setOnAction(e -> showSquirrel(primaryStage));
-
 
         // Ajouter un événement pour encoder
         encodeMenuItem.setOnAction(e -> {
@@ -117,7 +100,6 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-
     /***
      * Montrer le à propos.
      * @param primaryStage Stage principal
@@ -126,17 +108,19 @@ public class Main extends Application {
         Dialog<String> dialog = new Dialog<String>();
 
         dialog.setTitle("À propos");
+        dialog.setWidth(500);
         ButtonType type = new ButtonType("Fermer", ButtonData.OK_DONE);
 
-        dialog.setContentText("Ce programme a été conçu par Félix² dans le cadre du TP3 du cours de programation 3\ndu cégep de Lanaudière.\\n(Félix Charboneau et Félix Rondeau)");
+        dialog.setContentText("Ce programme a été conçu par Félix² dans le cadre du TP3 du cours de programation 3\ndu cégep de Lanaudière.\n(Félix Charboneau et Félix Rondeau)");
         dialog.getDialogPane().getButtonTypes().add(type);
 
         dialog.show();
     }
 
 
-    /***
-     * Montrer le petit écureuil.
+    /**
+     * À défaut de pouvoir acheter le squirrel wingsuit pour passer
+     * @param stage Stage principal
      */
     private void showSquirrel(Stage stage) {
         Dialog dialogSquirrel = new Dialog<>();
@@ -225,49 +209,43 @@ public class Main extends Application {
         dialogSquirrel.show();
     }
 
-    /***
-     * Action pour encoder.
+    /**
+     * Action pour encoder
+     * @param stage Stage principal
+     * @param progressBar Barre de progrès
+     * @param text Status
+     * @throws IOException
      */
     public void showEncode(Stage stage, ProgressBar progressBar,Text text) throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Ouvrir fichier à encoder");
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            Util.encryptFile(file,progressBar,text);
+            Util.encodeFile(file,progressBar,text);
         }
     }
 
-    /***
+    /**
      * Action pour décoder
+     * @param stage Stage principal
+     * @param progressBar barre de progres
+     * @param text Status
+     * @throws IOException
      */
     public void showDecode(Stage stage, ProgressBar progressBar, Text  text) throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Ouvrir fichier à décoder");
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Fichiers de Huffman (*.hd)", "*.hd");
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Clés de Huffman (*.hk)", "*.hk");
         fileChooser.getExtensionFilters().add(filter);
 
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            Util.decryptFile(file,progressBar,text);
+            Util.decodeFile(file,progressBar,text);
         }
     }
 
-
-
-
-
-
-
-
     public static void main(String[] args) {
         launch();
-
-
     }
-
-
-
-
-
 
 }

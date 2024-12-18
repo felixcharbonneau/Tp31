@@ -1,7 +1,5 @@
 package TP3;
 
-import TP3.PQNode.*;
-
 /**
  * File de prioritée
  * @param <T> type de donnée
@@ -22,14 +20,14 @@ public class PriorityQueue<T>{
      * @param priority prioritée de la donnée
      */
     public void push(T data, long priority) {
-        if (count > 0) {
+        if (first == null || first.priority >= priority) {
+            first = new PQNode<>(data, priority, first);
+        } else {
             PQNode<T> tmpNode = first;
-            while (tmpNode.right != null && tmpNode.right.priority < priority) {
+            while (tmpNode.right != null && tmpNode.right.priority <= priority) {
                 tmpNode = tmpNode.right;
             }
             tmpNode.right = new PQNode<T>(data, priority, tmpNode.right);
-        }else {
-            first = new PQNode<T>(data,priority,null);
         }
         count++;
     }
@@ -38,8 +36,8 @@ public class PriorityQueue<T>{
      */
     public void pop() {
         if (count > 0) {
-            first = first.right;
             count--;
+            first = count > 0 ? first.right : null;
         }
     }
     /**
@@ -47,7 +45,7 @@ public class PriorityQueue<T>{
      * @return le devant de la pile
      */
     public T front() {
-        if (count != 0) {
+        if (count > 0) {
             return first.data;
         } else {
             return null;
@@ -55,10 +53,10 @@ public class PriorityQueue<T>{
     }
     /**
      * Priorité du devant
-     * @return la priorité du devant
+     * @return la priorité du devant, -1 s'il n'a pas de devant
      */
     public long frontPriority() {
-        return first.priority;
+        return first != null ? first.priority : -1;
     }
     /**
      * Taille de la pile
