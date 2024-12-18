@@ -1,8 +1,12 @@
 package TP3;
 
+import javafx.scene.control.ProgressBar;
+import javafx.scene.text.Text;
+
 import java.io.*;
-import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Queue;
+
 /**
  * Classes utilitaires
  */
@@ -11,11 +15,15 @@ public class Util {
      * Encrypter un ficher
      * @param file ficher a encrypter
      */
-    public static void encryptFile(File file) throws IOException {
+    public static void encryptFile(File file, ProgressBar progressBar, Text status) throws IOException {
+        progressBar.setProgress(0.0);
+        progressBar.setVisible(true);
         file.createNewFile();
         int[] occurences = new int[256];
         Arrays.fill(occurences, 0);
         try {
+            status.setText("Recensement");
+            long size = file.length();
             FileInputStream fileInputStream = new FileInputStream(file);
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
             byte byteread;
@@ -25,6 +33,7 @@ public class Util {
                 }else {
                     occurences[(short)byteread + 256]++;
                 }
+                incrementProgress(progressBar,0.1/size);
             }
             //Écriture de la clé
 
@@ -47,8 +56,10 @@ public class Util {
             }else {
                 writer.write(8);
             }
+            status.setText("Écriture de la clé");
             for (short i = 0; i< occurences.length;i++) {
                 writer.write(occurences[i]);
+                incrementProgress(progressBar,0.1/256);
             }
             writer.close();
             PriorityQueue<HuffmanNode> queue = new PriorityQueue<HuffmanNode>();
@@ -68,6 +79,7 @@ public class Util {
             }
             //Écriture du fichier encodé
             String[] codes = new String[256];
+            System.out.println(queue.front());
             setCodes(codes, queue.front());
             String encryptedFileData = getFileNameWithoutExtension(file) + ".hd";
             File encryptedFile = new File(file.getParentFile(), encryptedFileData);
@@ -105,14 +117,16 @@ public class Util {
      * @param code code pour le caractere
      */
     private static void setCodes(String[] codes, HuffmanNode node , String code) {
-        if (node.right == null && node.left == null) {
-            codes[node.data > 0 ? node.data : node.data+256] = code;
-        }
-        if (node.right != null) {
-            setCodes(codes,node.right,code+"1");
-        }
-        if (node.left != null) {
-            setCodes(codes,node.left,code+"0");
+        if (node != null) {
+            if (node.right == null && node.left == null) {
+                codes[node.data > 0 ? node.data : node.data + 256] = code;
+            }
+            if (node.right != null) {
+                setCodes(codes, node.right, code + "1");
+            }
+            if (node.left != null) {
+                setCodes(codes, node.left, code + "0");
+            }
         }
     }
     /**
@@ -122,14 +136,16 @@ public class Util {
      */
     private static void setCodes(String[] codes, HuffmanNode node){
         String code = "";
-        if (node.right == null && node.left == null) {
-            codes[node.data > 0 ? node.data : node.data+256] = code;
-        }
-        if (node.right != null) {
-            setCodes(codes,node.right,code+"1");
-        }
-        if (node.left != null) {
-            setCodes(codes,node.left,code+"0");
+        if (node != null) {
+            if (node.right == null && node.left == null) {
+                codes[node.data > 0 ? node.data : node.data + 256] = code;
+            }
+            if (node.right != null) {
+                setCodes(codes, node.right, code + "1");
+            }
+            if (node.left != null) {
+                setCodes(codes, node.left, code + "0");
+            }
         }
     }
     /**
@@ -150,13 +166,15 @@ public class Util {
         }
         return bytes;
     }
-
     /**
      * Decodage d'un fichier
-     * @param file fichier de donnees
+     *
+     * @param file        fichier de donnees
+     * @param progressBar
+     * @param text
      * @throws IOException
      */
-    public static void decryptFile(File file) throws IOException {
+    public static void decryptFile(File file, ProgressBar progressBar, Text text) throws IOException {
         String keyName = getFileNameWithoutExtension(file) + ".hk";
         File key = new File(file.getParent(),keyName);
         FileInputStream fileInputStream = new FileInputStream(key);
@@ -167,15 +185,16 @@ public class Util {
         if (!magicNumber.equals("HK")) {
             System.out.println("Format de fichier invalide");
         }else {
-            int[] ocurrences = new int[256];
+            Byte[] fichier = new Byte[256];
             for(short i = 0; i<256; i++){
-                ocurrences[i]=bufferedInputStream.read();
+                fichier[i] = (byte) bufferedInputStream.read();
             }
-            System.out.println(Arrays.toString(ocurrences));
+            PriorityQueue<HuffmanNode> data = new PriorityQueue<HuffmanNode>();
+            for(int i = 0; i<256; i++){
+                data.push(new HuffmanNode((byte) i,null,null), data[i]);
+            }
         }
     }
-
-
     /**
      * Trouver le nom d'un fichier sans son extension
      * @param file fichier
@@ -189,6 +208,17 @@ public class Util {
         }
         return fileName;
     }
+    /**
+     * incrémenter le progres de la barre de chargement
+     * @param bar barre de chargement
+     * @param progress valeur de l'incrément
+     */
+    public static void incrementProgress(ProgressBar bar, double progress) {
+        progress = progress >= 1.0 ? 1.0 : bar.getProgress()+progress;
+        bar.setProgress(progress);
+    }
+
+
 
 }
 
