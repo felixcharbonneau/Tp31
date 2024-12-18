@@ -20,7 +20,7 @@ public class PriorityQueue<T>{
      * @param priority prioritée de la donnée
      */
     public void push(T data, long priority) {
-        if (first == null || first.priority >= priority) {
+        if (first == null || first.priority > priority) {
             first = new PQNode<>(data, priority, first);
         } else {
             PQNode<T> tmpNode = first;
