@@ -57,6 +57,7 @@ public class Main extends Application {
         pb.setMinWidth(500);
         pb.setPrefSize(250,20);
         pb.setVisible(false);
+
         Text text = new Text("");
         VBox vBox = new VBox(text);
 
@@ -78,7 +79,7 @@ public class Main extends Application {
         // Ajouter un événement pour encoder
         encodeMenuItem.setOnAction(e -> {
             try {
-                showEncode(primaryStage,pb,text);
+                showEncode(primaryStage, pb, text);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -105,11 +106,9 @@ public class Main extends Application {
      */
     private void showAboutInfo(Stage primaryStage) {
         Dialog<String> dialog = new Dialog<String>();
-
         dialog.setTitle("À propos");
         dialog.setWidth(500);
         ButtonType type = new ButtonType("Fermer", ButtonData.OK_DONE);
-
         dialog.setContentText("Ce programme a été conçu par Félix² dans le cadre du TP3 du cours de programation 3\ndu cégep de Lanaudière.\n(Félix Charboneau et Félix Rondeau)");
         dialog.getDialogPane().getButtonTypes().add(type);
 
@@ -219,7 +218,8 @@ public class Main extends Application {
         fileChooser.setTitle("Ouvrir fichier à encoder");
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            Util.encodeFile(file,progressBar,text);
+            progressBar.setVisible(true);
+            Util.encodeFile(file, progressBar, text);
         }
     }
 
@@ -238,7 +238,8 @@ public class Main extends Application {
 
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            Util.decodeFile(file,progressBar,text);
+            progressBar.setVisible(true);
+            Util.decodeFile(file, progressBar, text);
         }
     }
 

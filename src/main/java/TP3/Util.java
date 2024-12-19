@@ -1,7 +1,10 @@
 package TP3;
 
+import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -19,7 +22,6 @@ public class Util {
      */
     public static void encodeFile(File file, ProgressBar progressBar, Text status) throws IOException {
         progressBar.setProgress(0.0);
-        progressBar.setVisible(true);
         //Recensement
         status.setText("Recensement");
 
@@ -133,7 +135,6 @@ public class Util {
      */
     public static void decodeFile(File file, ProgressBar progressBar, Text status) throws IOException {
         progressBar.setProgress(0.0);
-        progressBar.setVisible(true);
 
         File dataFile = new File(file.getParent(),getFileNameWithoutExtension(file) + ".hd");
         FileInputStream keyFileInputStream = new FileInputStream(file);
@@ -241,7 +242,7 @@ public class Util {
     private static void setCodes(String[] codes, HuffmanNode node , String code, ProgressBar progressBar) {
         if (node != null) {
             if (node.right == null && node.left == null) {
-                codes[node.data >= 0 ? node.data : node.data + 256] = code;
+                codes[node.data >= 0 ? node.data : (short)node.data + 256] = code;
                 incrementProgress(progressBar, 0.1/256);
             }
             if (node.right != null) {
@@ -262,7 +263,7 @@ public class Util {
         String code = "";
         if (node != null) {
             if (node.right == null && node.left == null) {
-                codes[node.data >= 0 ? node.data : node.data + 256] = code;
+                codes[node.data >= 0 ? node.data : (short)node.data + 256] = code;
                 incrementProgress(progressBar, 0.1/256);
             }
             if (node.right != null) {

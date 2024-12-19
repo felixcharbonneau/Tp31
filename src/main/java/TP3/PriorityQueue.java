@@ -47,9 +47,8 @@ public class PriorityQueue<T>{
     public T front() {
         if (count > 0) {
             return first.data;
-        } else {
-            return null;
         }
+        return null;
     }
     /**
      * Priorité du devant
