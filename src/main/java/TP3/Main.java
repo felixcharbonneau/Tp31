@@ -21,7 +21,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
 
-
         // Création de la barre de menu
         MenuBar menuBar = new MenuBar();
 
@@ -116,7 +115,6 @@ public class Main extends Application {
 
         dialog.show();
     }
-
 
     /**
      * À défaut de pouvoir acheter le squirrel wingsuit pour passer

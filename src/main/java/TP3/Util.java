@@ -48,7 +48,6 @@ public class Util {
                 max = occurences[i];
             }
         }
-        System.out.println(Arrays.toString(occurences));
         if (max<Byte.MAX_VALUE){
             writer1.write(1);
             for (short i = 0; i < 256;i++) {
@@ -112,7 +111,6 @@ public class Util {
         }
         byte[] bytes = stringToByteArray(String.valueOf(result));
         System.out.println(result);
-        System.out.println(Arrays.toString(bytes));
         //Écriture du fichier chiffré
         FileOutputStream writer2 = new FileOutputStream(dataFile);
         status.setText("Écriture du fichier chiffré");
@@ -145,103 +143,92 @@ public class Util {
         magicNumber+=(char)keyDataInputStream.read();
         if (!magicNumber.equals("HK")) {
             System.out.println("Format de fichier invalide");
-        }else {
-            long[] occurences = new long[256];
-            status.setText("Lecture de la clé");
-            byte dataSize = (byte) keyDataInputStream.read();
-            if (dataSize == 1) {
-                for (short i = 0; i < 256; i++) {
-                    occurences[i] = keyDataInputStream.read();
-                    incrementProgress(progressBar, 0.1 / 256);
-                }
-            } else if (dataSize == 2) {
-                for (short i = 0; i < 256; i++) {
-                    occurences[i] = keyDataInputStream.readShort();
-                    incrementProgress(progressBar, 0.1 / 256);
-                }
-            } else if (dataSize == 4) {
-                for (short i = 0; i < 256; i++) {
-                    occurences[i] = keyDataInputStream.readInt();
-                    incrementProgress(progressBar, 0.1 / 256);
-                }
-            }else {
-                for (short i = 0; i < 256; i++) {
-                    occurences[i] = keyDataInputStream.readLong();
-                    incrementProgress(progressBar, 0.1 / 256);
-                }
-            }
-            System.out.println(Arrays.toString(occurences));
-            //Construction de l'arbre
-            status.setText("Construction de l'arbre");
-            PriorityQueue<HuffmanNode> dataQueue = new PriorityQueue<HuffmanNode>();
-            for(int i = 0; i<256; i++){
-                if (occurences[i] != 0) {
-                    dataQueue.push(new HuffmanNode((byte)i,null,null),occurences[i]);
-                    incrementProgress(progressBar,0.1/256);
-                }
-            }
-
-            buildHuffmanTree(dataQueue, progressBar);
-
-            //Decodage
-            status.setText("Décodage");
-            String[] codes = new String[256];
-            setCodes(codes, dataQueue.front(),progressBar);
-
-            keyFileInputStream.close();
-            keyDataInputStream.close();
-            //Dechiffrement
-            FileInputStream dataFileInputStream = new FileInputStream(dataFile);
-            BufferedInputStream dataBufferedInputStream = new BufferedInputStream(dataFileInputStream);
-            status.setText("Déchiffrement");
-            magicNumber = "";
-            magicNumber+=(char)dataBufferedInputStream.read();
-            magicNumber+=(char)dataBufferedInputStream.read();
-            if (!magicNumber.equals("HD")){
-                System.out.println("Fichier de données HD invalide: " + dataFile.getAbsolutePath());
-            }else {
-                StringBuilder data = new StringBuilder();
-                byte byteRead;
-                while ((byteRead = (byte) dataBufferedInputStream.read()) != -1) {
-                    String binaryString = String.format("%8s", Integer.toBinaryString(byteRead & 0xFF)).replace(' ', '0');
-                    data.append(binaryString);
-                }
-                System.out.println(data);
-                char[] directions = data.toString().toCharArray();
-                System.out.println(Arrays.toString(directions));
-                HuffmanNode root = dataQueue.front();
-                //Écriture du fichier
-                File fileToWrite = new File(file.getParent(),getFileNameWithoutExtension(file) + ".dec");
-                //fileToWrite.createNewFile();
-                FileOutputStream fileOutputStream = new FileOutputStream(fileToWrite);
-                BufferedOutputStream writer = new BufferedOutputStream(fileOutputStream);
-
-                for (int i = 0; i < directions.length; i++) {
-                    boolean isLeaf = false;
-                    while (!isLeaf) {
-                        if (directions[i] == '1') {
-                            root = root.right;
-                        }else if (directions[i] == '0') {
-                            root = root.left;
-                        }
-                        if (i < directions.length-1){
-                            i++;
-                        }
-                        if((directions[i] == '0' && root.left == null) || (directions[i] == '1' && root.right == null)) {
-                            isLeaf = true;
-                        }
-                    }
-                    writer.write(root.data);
-                    if (fileToWrite.length() == dataQueue.frontPriority()) {
-                        i = directions.length;
-                    }
-                    root = dataQueue.front();
-                }
-                writer.flush();
-                writer.close();
-            }
-
+            return;
         }
+
+        long[] occurences = new long[256];
+        status.setText("Lecture de la clé");
+        byte dataSize = (byte) keyDataInputStream.read();
+        if (dataSize == 1) {
+            for (short i = 0; i < 256; i++) {
+                occurences[i] = keyDataInputStream.readByte();
+                incrementProgress(progressBar, 0.1 / 256);
+            }
+        } else if (dataSize == 2) {
+            for (short i = 0; i < 256; i++) {
+                occurences[i] = keyDataInputStream.readShort();
+                incrementProgress(progressBar, 0.1 / 256);
+            }
+        } else if (dataSize == 4) {
+            for (short i = 0; i < 256; i++) {
+                occurences[i] = keyDataInputStream.readInt();
+                incrementProgress(progressBar, 0.1 / 256);
+            }
+        }else {
+            for (short i = 0; i < 256; i++) {
+                occurences[i] = keyDataInputStream.readLong();
+                incrementProgress(progressBar, 0.1 / 256);
+            }
+        }
+        //Construction de l'arbre
+        status.setText("Construction de l'arbre");
+        PriorityQueue<HuffmanNode> dataQueue = new PriorityQueue<HuffmanNode>();
+        for(int i = 0; i<256; i++){
+            if (occurences[i] != 0) {
+                dataQueue.push(new HuffmanNode((byte)i,null,null),occurences[i]);
+                incrementProgress(progressBar,0.1/256);
+            }
+        }
+        buildHuffmanTree(dataQueue, progressBar);
+        //Decodage
+        status.setText("Décodage");
+        String[] codes = new String[256];
+        setCodes(codes, dataQueue.front(),progressBar);
+        keyFileInputStream.close();
+        keyDataInputStream.close();
+        //Dechiffrement
+        FileInputStream dataFileInputStream = new FileInputStream(dataFile);
+        BufferedInputStream dataBufferedInputStream = new BufferedInputStream(dataFileInputStream);
+        status.setText("Déchiffrement");
+        magicNumber = "";
+        magicNumber+=(char)dataBufferedInputStream.read();
+        magicNumber+=(char)dataBufferedInputStream.read();
+        if (!magicNumber.equals("HD")) {
+            System.out.println("Fichier de données HD invalide: " + dataFile.getAbsolutePath());
+            return;
+        }
+        StringBuilder data = new StringBuilder();
+        byte byteRead;
+        for (int i = 2; i < dataFile.length(); i++) {
+            byteRead = (byte) dataBufferedInputStream.read();
+            int unsignedByte = byteRead & 0xFF;
+            String binaryString = String.format("%8s", Integer.toBinaryString(unsignedByte)).replace(' ', '0');
+            data.append(binaryString);
+        }
+        dataBufferedInputStream.close();
+        char[] directions = data.toString().toCharArray();
+        HuffmanNode root = dataQueue.front();
+        //Écriture du fichier
+        File fileToWrite = new File(file.getParent(),getFileNameWithoutExtension(file) + ".dec");
+        FileOutputStream fileOutputStream = new FileOutputStream(fileToWrite);
+        BufferedOutputStream writer = new BufferedOutputStream(fileOutputStream);
+        for (int i = 0; i < directions.length; i++) {
+            if (directions[i] == '1') {
+                root = root.right;
+            }else if (directions[i] == '0') {
+                root = root.left;
+            }
+            if((directions[i] == '0' && root.left == null) || (directions[i] == '1' && root.right == null)) {
+                writer.write(root.data);
+                root = dataQueue.front();
+            }
+            if (fileToWrite.length() >= dataQueue.frontPriority()) {
+                i = directions.length;
+            }
+        }
+        writer.flush();
+        writer.close();
+
     }
 
     /**
@@ -344,9 +331,4 @@ public class Util {
             incrementProgress(progressBar,0.2/size);
         }
     }
-
-
-
-
-
 }
